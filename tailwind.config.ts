@@ -35,8 +35,25 @@ const config: Config = {
           800: "var(--color-purple-800)",
         },
       },
+      typography: {
+        DEFAULT: {
+          css: {
+            maxWidth: "none",
+            color: "inherit",
+            a: {
+              color: "inherit",
+              textDecoration: "underline",
+              fontWeight: "500",
+            },
+            strong: {
+              color: "inherit",
+              fontWeight: "600",
+            },
+          },
+        },
+      },
     },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/typography")],
 };
 export default config;

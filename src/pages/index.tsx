@@ -1,6 +1,9 @@
 import localFont from "next/font/local";
+import { useEffect, useRef, useState } from "react";
 import Navbar from "../components/Navbar";
-import JobCard, { Job } from "../components/JobCard";
+import JobCard from "../components/JobCard";
+import { GetServerSideProps } from "next";
+import type { Job, JobsResponse, Pagination } from "../types/job";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -13,53 +16,83 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-// Static job data (this would normally come from an API)
-const jobs: Job[] = [
-  {
-    id: "1",
-    title: "Senior Frontend Developer",
-    job_markdown: `
-# Senior Frontend Developer
+interface HomeProps {
+  initialData: JobsResponse;
+}
 
-We're looking for an experienced Frontend Developer to join our team. You'll be working with React, TypeScript, and Next.js to build modern web applications.
+export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/jobs?page=1`
+    );
+    const initialData = await res.json();
 
-## Requirements:
-- Strong understanding of web performance
-- Experience with React and TypeScript
-- Knowledge of accessibility standards
+    return {
+      props: { initialData },
+    };
+  } catch (error) {
+    console.error("Error fetching jobs:", error);
+    return {
+      props: {
+        initialData: {
+          success: false,
+          message: "Error fetching jobs",
+          data: {
+            jobs: [],
+            pagination: { total: 0, page: 1, limit: 10, totalPages: 0 },
+          },
+        },
+      },
+    };
+  }
+};
 
-## What we offer:
-- Competitive salary
-- Remote work options
-- Health benefits
-    `,
-    date: "2024-02-20",
-    tags: ["React", "TypeScript", "Remote"],
-  },
-  {
-    id: "2",
-    title: "Full Stack Engineer",
-    job_markdown: `
-# Full Stack Engineer
+export default function Home({ initialData }: HomeProps) {
+  const [jobs, setJobs] = useState<Job[]>(initialData.data.jobs);
+  const [pagination, setPagination] = useState<Pagination>(
+    initialData.data.pagination
+  );
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const observerTarget = useRef<HTMLDivElement>(null);
 
-Join our growing team as a Full Stack Engineer. You'll be responsible for developing and maintaining both frontend and backend systems.
+  const loadMoreJobs = async () => {
+    if (isLoading || pagination.page >= pagination.totalPages) return;
 
-## Key Responsibilities:
-- Develop scalable web applications
-- Work with cloud infrastructure
-- Collaborate with cross-functional teams
+    setIsLoading(true);
+    try {
+      const nextPage = pagination.page + 1;
+      const res = await fetch(`/api/jobs?page=${nextPage}`);
+      const data: JobsResponse = await res.json();
 
-## Required Skills:
-- Node.js
-- React
-- AWS experience
-    `,
-    date: "2024-02-19",
-    tags: ["Node.js", "React", "AWS", "Full-time"],
-  },
-];
+      setJobs((prevJobs) => [...prevJobs, ...data.data.jobs]);
+      setPagination(data.data.pagination);
+      setHasError(false);
+    } catch (error) {
+      console.error("Error loading more jobs:", error);
+      setHasError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-export default function Home() {
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMoreJobs();
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => observer.disconnect();
+  }, [pagination.page, isLoading]);
+
   return (
     <div
       className={`${geistSans.variable} ${geistMono.variable} min-h-screen font-[family-name:var(--font-geist-sans)]`}
@@ -69,8 +102,34 @@ export default function Home() {
         <h1 className="text-2xl font-bold mb-6">Latest Jobs</h1>
         <div className="space-y-4">
           {jobs.map((job) => (
-            <JobCard key={job.id} job={job} />
+            <JobCard key={job._id} job={job} />
           ))}
+
+          {/* Loading indicator */}
+          {isLoading && (
+            <div className="py-4 text-center text-gray-600">
+              Loading more jobs...
+            </div>
+          )}
+
+          {/* Error message */}
+          {hasError && (
+            <div className="py-4 text-center text-red-600">
+              Error loading jobs. Please try again.
+            </div>
+          )}
+
+          {/* Intersection observer target */}
+          {pagination.page < pagination.totalPages && (
+            <div ref={observerTarget} className="h-10" />
+          )}
+
+          {/* End of list message */}
+          {pagination.page >= pagination.totalPages && jobs.length > 0 && (
+            <div className="py-4 text-center text-gray-600">
+              No more jobs to load.
+            </div>
+          )}
         </div>
       </main>
     </div>
