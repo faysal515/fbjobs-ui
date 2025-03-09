@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 import JobCard from "../components/JobCard";
 import { GetServerSideProps } from "next";
 import type { Job, JobsResponse, Pagination } from "../types/job";
+import SEO from "../components/SEO";
 
 interface HomeProps {
   initialData: JobsResponse;
@@ -84,6 +85,8 @@ export default function Home({ initialData }: HomeProps) {
 
   return (
     <div className={fontClassName}>
+      <SEO />
+
       <Navbar />
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-2xl font-bold mb-6">Latest Jobs</h1>

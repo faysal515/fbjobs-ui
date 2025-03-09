@@ -4,6 +4,7 @@ import Navbar from "../../components/Navbar";
 import { marked } from "marked";
 import Link from "next/link";
 import type { Job } from "../../types/job";
+import SEO from "../../components/SEO";
 
 // Format date to be more readable
 function formatDate(dateString: string): string {
@@ -39,6 +40,17 @@ function capitalize(text: string): string {
     .split(" ")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(" ");
+}
+
+// Create a clean description for SEO from job markdown
+function createMetaDescription(markdown: string): string {
+  // Remove markdown formatting and get plain text
+  const plainText = markdown.replace(/[#*`_\[\]()]/g, "");
+
+  // Truncate to ~155 characters for meta description
+  return (
+    plainText.substring(0, 155).trim() + (plainText.length > 155 ? "..." : "")
+  );
 }
 
 interface JobDetailsProps {
@@ -77,11 +89,26 @@ export const getServerSideProps: GetServerSideProps<JobDetailsProps> = async (
 export default function JobDetails({ job }: JobDetailsProps) {
   const renderedMarkdown = marked.parse(job.job_markdown);
 
+  // Prepare SEO data
+  const jobTitle = capitalize(job.title);
+  const companyName = capitalize(job.company);
+  const pageTitle = `${jobTitle} at ${companyName} | FB Jobs`;
+  const metaDescription = createMetaDescription(job.job_markdown);
+  const keywords = job.skills ? job.skills.join(", ").toLowerCase() : "";
+  const canonicalUrl = `https://fbjobs.com/jobs/${job._id}`;
+
   return (
     <div className={fontClassName}>
+      <SEO
+        title={pageTitle}
+        description={metaDescription}
+        keywords={`${keywords}, ${job.job_type}, ${job.location_type}`}
+        ogType="article"
+        ogUrl={canonicalUrl}
+        canonicalUrl={canonicalUrl}
+      />
       <Navbar />
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Back button - clean, no dark mode */}
         <Link
           href="/"
           className="inline-flex items-center text-base font-semibold text-blue-600 hover:text-blue-800 mb-6 transition-colors"
