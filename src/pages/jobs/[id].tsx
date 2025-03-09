@@ -1,6 +1,5 @@
 import { GetServerSideProps } from "next";
 import { fontClassName } from "../../config/fonts";
-import Navbar from "../../components/Navbar";
 import { marked } from "marked";
 import Link from "next/link";
 import type { Job } from "../../types/job";
@@ -92,7 +91,7 @@ export default function JobDetails({ job }: JobDetailsProps) {
   // Prepare SEO data
   const jobTitle = capitalize(job.title);
   const companyName = capitalize(job.company);
-  const pageTitle = `${jobTitle} at ${companyName} | FB Jobs`;
+  const pageTitle = `${jobTitle} at ${companyName} | BD Dev jobs`;
   const metaDescription = createMetaDescription(job.job_markdown);
   const keywords = job.skills ? job.skills.join(", ").toLowerCase() : "";
   const canonicalUrl = `https://fbjobs.com/jobs/${job._id}`;
@@ -107,7 +106,6 @@ export default function JobDetails({ job }: JobDetailsProps) {
         ogUrl={canonicalUrl}
         canonicalUrl={canonicalUrl}
       />
-      <Navbar />
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Link
           href="/"

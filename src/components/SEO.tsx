@@ -11,7 +11,7 @@ interface SEOProps {
 }
 
 export default function SEO({
-  title = "FB Jobs | Find Your Next Career Opportunity",
+  title = "BD Dev jobs | Find Your Next Career Opportunity",
   description = "Discover the latest job opportunities in tech, marketing, design and more. Updated daily with new positions from top companies.",
   keywords = "jobs, career, hiring, tech jobs, remote work, job board, employment opportunities",
   ogType = "website",

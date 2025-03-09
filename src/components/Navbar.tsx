@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
+import Image from "next/image";
 
 export default function Navbar() {
   const router = useRouter();
@@ -9,8 +10,15 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center">
-            <Link href="/" className="flex items-center">
-              <span className="ml-2 text-lg font-semibold">FB JOBS</span>
+            <Link href="/" className="flex items-center p-2">
+              <Image
+                src="/logo.png"
+                alt="BD Jobs Logo"
+                width={120}
+                height={40}
+                className="object-contain mx-4"
+                style={{ marginTop: "2rem" }}
+              />
             </Link>
           </div>
 
