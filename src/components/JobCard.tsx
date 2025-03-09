@@ -44,7 +44,8 @@ function capitalize(text: string): string {
 }
 
 export default function JobCard({ job }: { job: Job }) {
-  const plainTextDescription = stripMarkdown(job.job_markdown);
+  const plainTextDescription =
+    job.job_plain_text || stripMarkdown(job.job_markdown);
   const hasSalary = job.salary_min > 0 && job.salary_max > 0;
   const firstTag =
     job.tags && job.tags.length > 0 ? job.tags[0] : job.location_type;

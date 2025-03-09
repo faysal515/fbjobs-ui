@@ -4,6 +4,7 @@ export interface Job {
   author: string;
   images: string[];
   job_markdown: string;
+  job_plain_text: string;
   title: string;
   company: string;
   location: string;
