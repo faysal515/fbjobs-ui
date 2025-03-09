@@ -1,24 +1,9 @@
 import { GetServerSideProps } from "next";
-import localFont from "next/font/local";
+import { fontClassName } from "../../config/fonts";
 import Navbar from "../../components/Navbar";
 import { marked } from "marked";
 import Link from "next/link";
 import type { Job } from "../../types/job";
-
-const geistSans = localFont({
-  src: "../fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "../fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
-
-interface JobDetailsProps {
-  job: Job;
-}
 
 // Format date to be more readable
 function formatDate(dateString: string): string {
@@ -56,6 +41,10 @@ function capitalize(text: string): string {
     .join(" ");
 }
 
+interface JobDetailsProps {
+  job: Job;
+}
+
 export const getServerSideProps: GetServerSideProps<JobDetailsProps> = async (
   context
 ) => {
@@ -89,9 +78,7 @@ export default function JobDetails({ job }: JobDetailsProps) {
   const renderedMarkdown = marked.parse(job.job_markdown);
 
   return (
-    <div
-      className={`${geistSans.variable} ${geistMono.variable} min-h-screen font-[family-name:var(--font-geist-sans)]`}
-    >
+    <div className={fontClassName}>
       <Navbar />
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back button */}

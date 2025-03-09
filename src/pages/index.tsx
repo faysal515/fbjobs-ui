@@ -1,20 +1,9 @@
-import localFont from "next/font/local";
+import { fontClassName } from "../config/fonts";
 import { useEffect, useRef, useState } from "react";
 import Navbar from "../components/Navbar";
 import JobCard from "../components/JobCard";
 import { GetServerSideProps } from "next";
 import type { Job, JobsResponse, Pagination } from "../types/job";
-
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
 
 interface HomeProps {
   initialData: JobsResponse;
@@ -94,9 +83,7 @@ export default function Home({ initialData }: HomeProps) {
   }, [pagination.page, isLoading]);
 
   return (
-    <div
-      className={`${geistSans.variable} ${geistMono.variable} min-h-screen font-[family-name:var(--font-geist-sans)]`}
-    >
+    <div className={fontClassName}>
       <Navbar />
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-2xl font-bold mb-6">Latest Jobs</h1>

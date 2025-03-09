@@ -1,18 +1,9 @@
 import { marked } from "marked";
 import he from "he";
 import Link from "next/link";
+import { formatDistanceToNow } from "date-fns";
+import { Building2, MapPin, Clock, Banknote } from "lucide-react";
 import type { Job } from "../types/job";
-
-// Predefined color mapping for tags
-const TAG_COLORS = ["blue", "green", "purple"] as const;
-
-// Function to get consistent color for a tag
-function getTagColor(tag: string): string {
-  const index = tag
-    .split("")
-    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  return TAG_COLORS[index % TAG_COLORS.length];
-}
 
 // Function to strip markdown and get plain text
 function stripMarkdown(markdown: string): string {
@@ -28,20 +19,6 @@ function stripMarkdown(markdown: string): string {
     );
   }
   return "";
-}
-
-// Format date to be more readable
-function formatDate(dateString: string): string {
-  try {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    }).format(date);
-  } catch {
-    return dateString;
-  }
 }
 
 // Format salary range
@@ -68,68 +45,84 @@ function capitalize(text: string): string {
 
 export default function JobCard({ job }: { job: Job }) {
   const plainTextDescription = stripMarkdown(job.job_markdown);
+  const hasSalary = job.salary_min > 0 && job.salary_max > 0;
+  const firstTag =
+    job.tags && job.tags.length > 0 ? job.tags[0] : job.location_type;
 
   return (
     <div className="border border-black/[.08] dark:border-white/[.145] rounded-lg p-6 hover:border-black/20 dark:hover:border-white/30 transition-colors">
-      {/* Job Type Banner */}
-      <div className="flex justify-end mb-2">
-        <span className="text-xs font-medium text-blue-800 bg-blue-50 px-2 py-0.5 rounded">
-          {capitalize(job.job_type)}
-        </span>
-      </div>
+      <div className="flex items-start gap-4">
+        {/* First Tag Circle */}
+        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gray-900 dark:bg-gray-800 flex items-center justify-center">
+          <span className="text-white font-bold text-sm text-center px-1">
+            {capitalize(firstTag)}
+          </span>
+        </div>
 
-      <div className="flex justify-between items-start mb-3">
-        <div>
-          <Link href={`/jobs/${job._id}`} className="group">
-            <h2 className="text-lg font-semibold uppercase group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-              {job.title}
-            </h2>
-          </Link>
-          <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            {capitalize(job.company)} • {capitalize(job.location)}
+        <div className="flex-grow">
+          {/* First Row: Title and Posted Time */}
+          <div className="flex justify-between items-center">
+            <Link href={`/jobs/${job._id}`} className="group">
+              <h2 className="text-lg font-semibold uppercase group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                {job.title}
+              </h2>
+            </Link>
+            <div className="flex items-center gap-1 text-sm text-gray-500">
+              <Clock className="w-4 h-4" />
+              <span>{formatDistanceToNow(new Date(job.created_at))} ago</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 mt-2 flex-wrap text-sm">
+            <div className="flex items-center gap-1">
+              <Building2 className="w-4 h-4 text-gray-500" />
+              <span className="font-semibold text-gray-900 dark:text-gray-100">
+                {capitalize(job.company)}
+              </span>
+            </div>
+            <span className="text-gray-400">|</span>
+
+            <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+              <MapPin className="w-4 h-4" />
+              <span>{capitalize(job.location)}</span>
+            </div>
+            {hasSalary && (
+              <>
+                <span className="text-gray-400">|</span>
+                <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                  <Banknote className="w-4 h-4" />
+                  <span>
+                    {formatSalary(
+                      job.salary_min,
+                      job.salary_max,
+                      job.salary_currency
+                    )}
+                  </span>
+                </div>
+              </>
+            )}
           </div>
         </div>
-        <time className="text-sm text-gray-500 whitespace-nowrap ml-4">
-          {formatDate(job.created_at)}
-        </time>
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-3">
-        <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-          {capitalize(job.location_type)}
-        </span>
-        <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-          {formatSalary(job.salary_min, job.salary_max, job.salary_currency)}
-        </span>
-        {job.tags && job.tags.length > 0 && (
-          <span
-            className={`px-2.5 py-0.5 rounded-full text-xs font-medium bg-${getTagColor(
-              job.tags[0]
-            )}-50 text-${getTagColor(job.tags[0])}-800`}
-          >
-            {capitalize(job.tags[0])}
-          </span>
-        )}
+      {/* Job Description */}
+      <div className="mt-4 flex gap-2">
+        <p className="text-gray-600 dark:text-gray-300 line-clamp-2">
+          {plainTextDescription}
+        </p>
       </div>
-
-      <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
-        {plainTextDescription}
-      </p>
 
       {/* Skills */}
       {job.skills && job.skills.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-3">
-          {job.skills.map((skill) => {
-            const color = getTagColor(skill);
-            return (
-              <span
-                key={skill}
-                className={`px-2.5 py-0.5 rounded-full text-xs font-medium bg-${color}-100 text-${color}-800`}
-              >
-                {capitalize(skill)}
-              </span>
-            );
-          })}
+        <div className="flex flex-wrap gap-2 mt-4">
+          {job.skills.map((skill) => (
+            <span
+              key={skill}
+              className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+            >
+              {capitalize(skill)}
+            </span>
+          ))}
         </div>
       )}
     </div>
