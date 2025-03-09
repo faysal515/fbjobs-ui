@@ -2,8 +2,6 @@ import { GetServerSideProps } from "next";
 import localFont from "next/font/local";
 import Navbar from "../../components/Navbar";
 import { marked } from "marked";
-import he from "he";
-import Image from "next/image";
 import Link from "next/link";
 import type { Job } from "../../types/job";
 
