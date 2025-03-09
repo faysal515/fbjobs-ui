@@ -3,6 +3,7 @@ import he from "he";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { Building2, MapPin, Clock, Banknote } from "lucide-react";
+import { capitalize } from "../util";
 import type { Job } from "../types/job";
 
 // Function to strip markdown and get plain text
@@ -35,14 +36,6 @@ function formatSalary(min: number, max: number, currency: string): string {
   return `${formatter.format(min)} - ${formatter.format(max)}`;
 }
 
-// Capitalize text
-function capitalize(text: string): string {
-  return text
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(" ");
-}
-
 export default function JobCard({ job }: { job: Job }) {
   const plainTextDescription =
     job.job_plain_text || stripMarkdown(job.job_markdown);
@@ -51,10 +44,10 @@ export default function JobCard({ job }: { job: Job }) {
     job.tags && job.tags.length > 0 ? job.tags[0] : job.location_type;
 
   return (
-    <div className="border border-black/[.08] dark:border-white/[.145] rounded-lg p-6 hover:border-black/20 dark:hover:border-white/30 transition-colors">
+    <div className="border border-black/[.08] rounded-lg p-6 hover:border-black/20 transition-colors">
       <div className="flex items-start gap-4">
         {/* First Tag Circle */}
-        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gray-900 dark:bg-gray-800 flex items-center justify-center">
+        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gray-900 flex items-center justify-center">
           <span className="text-white font-bold text-sm text-center px-1">
             {capitalize(firstTag)}
           </span>
@@ -64,7 +57,7 @@ export default function JobCard({ job }: { job: Job }) {
           {/* First Row: Title and Posted Time */}
           <div className="flex justify-between items-center">
             <Link href={`/jobs/${job._id}`} className="group">
-              <h2 className="text-lg font-semibold uppercase group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+              <h2 className="text-lg font-semibold uppercase group-hover:text-blue-600 transition-colors">
                 {job.title}
               </h2>
             </Link>
@@ -77,20 +70,21 @@ export default function JobCard({ job }: { job: Job }) {
           <div className="flex items-center gap-2 mt-2 flex-wrap text-sm">
             <div className="flex items-center gap-1">
               <Building2 className="w-4 h-4 text-gray-500" />
-              <span className="font-semibold text-gray-900 dark:text-gray-100">
+              <span className="font-semibold text-gray-900">
                 {capitalize(job.company)}
               </span>
             </div>
+
             <span className="text-gray-400">|</span>
 
-            <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+            <div className="flex items-center gap-1 text-gray-600">
               <MapPin className="w-4 h-4" />
               <span>{capitalize(job.location)}</span>
             </div>
             {hasSalary && (
               <>
                 <span className="text-gray-400">|</span>
-                <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                <div className="flex items-center gap-1 text-gray-600">
                   <Banknote className="w-4 h-4" />
                   <span>
                     {formatSalary(
@@ -108,9 +102,7 @@ export default function JobCard({ job }: { job: Job }) {
 
       {/* Job Description */}
       <div className="mt-4 flex gap-2">
-        <p className="text-gray-600 dark:text-gray-300 line-clamp-2">
-          {plainTextDescription}
-        </p>
+        <p className="text-gray-600 line-clamp-2">{plainTextDescription}</p>
       </div>
 
       {/* Skills */}

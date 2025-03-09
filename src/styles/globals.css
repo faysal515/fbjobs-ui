@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  /* Base colors */
+  /* Base colors - Light theme only */
   --color-background: #ffffff;
   --color-foreground: #171717;
   
@@ -19,13 +19,6 @@
   --color-purple-100: #f3e8ff;
   --color-purple-300: #d8b4fe;
   --color-purple-800: #6b21a8;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-background: #0a0a0a;
-    --color-foreground: #ededed;
-  }
 }
 
 body {
