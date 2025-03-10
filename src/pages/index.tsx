@@ -4,6 +4,7 @@ import JobCard from "../components/JobCard";
 import { GetServerSideProps } from "next";
 import type { Job, JobsResponse, Pagination } from "../types/job";
 import SEO from "../components/SEO";
+import { formatDistanceToNow } from "date-fns";
 
 interface HomeProps {
   initialData: JobsResponse;
@@ -87,7 +88,13 @@ export default function Home({ initialData }: HomeProps) {
       <SEO />
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-2xl font-bold mb-6">Latest Jobs</h1>
+        <h1 className="text-2xl font-bold mb-2">All Jobs</h1>
+        {jobs.length > 0 && (
+          <p className="text-gray-600 text-sm mb-6">
+            Most recent job uploaded{" "}
+            {formatDistanceToNow(new Date(jobs[0].created_at))} ago.
+          </p>
+        )}
         <div className="space-y-4">
           {jobs.map((job) => (
             <JobCard key={job._id} job={job} />
@@ -115,7 +122,7 @@ export default function Home({ initialData }: HomeProps) {
           {/* End of list message */}
           {pagination.page >= pagination.totalPages && jobs.length > 0 && (
             <div className="py-4 text-center text-gray-600">
-              No more jobs to load.
+              {`That's all for now.`}
             </div>
           )}
         </div>

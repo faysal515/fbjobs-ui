@@ -10,15 +10,15 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center">
-            <Link href="/" className="flex items-center p-2">
-              <Image
-                src="/logo.png"
-                alt="BD Jobs Logo"
-                width={120}
-                height={40}
-                className="object-contain mx-4"
-                style={{ marginTop: "2rem" }}
-              />
+            <Link href="/" className="flex items-center">
+              <div className="p-4 mt-8">
+                <Image
+                  src="/logo.svg"
+                  alt="BD Jobs Logo"
+                  width={120}
+                  height={40}
+                />
+              </div>
             </Link>
           </div>
 
