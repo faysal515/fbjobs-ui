@@ -91,8 +91,15 @@ export default function Home({ initialData }: HomeProps) {
         <h1 className="text-2xl font-bold mb-2">All Jobs</h1>
         {jobs.length > 0 && (
           <p className="text-gray-600 text-sm mb-6">
-            Most recent job uploaded{" "}
-            {formatDistanceToNow(new Date(jobs[0].created_at))} ago.
+            Total{" "}
+            <span className="font-bold text-black dark:text-white bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-md">
+              {pagination.total}
+            </span>{" "}
+            jobs found. Most recent job published{" "}
+            <span className="font-semibold text-blue-600 dark:text-blue-400">
+              {formatDistanceToNow(new Date(jobs[0].created_at))}
+            </span>{" "}
+            ago.
           </p>
         )}
         <div className="space-y-4">
