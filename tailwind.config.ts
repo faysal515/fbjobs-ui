@@ -16,6 +16,13 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      keyframes: {
+        loading: {
+          "0%": { width: "0%" },
+          "50%": { width: "70%" },
+          "100%": { width: "100%" },
+        },
+      },
       colors: {
         background: "var(--color-background)",
         foreground: "var(--color-foreground)",

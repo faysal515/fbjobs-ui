@@ -2,6 +2,8 @@ import { GetServerSideProps } from "next";
 import { fontClassName } from "../../config/fonts";
 import { marked } from "marked";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import type { Job } from "../../types/job";
 import SEO from "../../components/SEO";
 
@@ -53,12 +55,17 @@ function createMetaDescription(markdown: string): string {
 }
 
 interface JobDetailsProps {
-  job: Job;
+  initialJob?: Job; // Make it optional since we might fetch on client
 }
 
 export const getServerSideProps: GetServerSideProps<JobDetailsProps> = async (
   context
 ) => {
+  // Only fetch on first page load
+  if (context.req.headers.referer?.includes("/jobs/")) {
+    return { props: {} };
+  }
+
   try {
     const { id } = context.params || {};
     const res = await fetch(
@@ -67,25 +74,51 @@ export const getServerSideProps: GetServerSideProps<JobDetailsProps> = async (
     const data = await res.json();
 
     if (!data.success) {
-      return {
-        notFound: true,
-      };
+      return { notFound: true };
     }
 
     return {
       props: {
-        job: data.data,
+        initialJob: data.data,
       },
     };
   } catch (error) {
     console.error("Error fetching job details:", error);
-    return {
-      notFound: true,
-    };
+    return { notFound: true };
   }
 };
 
-export default function JobDetails({ job }: JobDetailsProps) {
+export default function JobDetails({ initialJob }: JobDetailsProps) {
+  const router = useRouter();
+  const { id } = router.query;
+  const [job, setJob] = useState<Job | undefined>(initialJob);
+
+  useEffect(() => {
+    if (!initialJob && id) {
+      const fetchJob = async () => {
+        try {
+          const res = await fetch(`/api/jobs/${id}`);
+          const data = await res.json();
+          if (data.success) {
+            setJob(data.data);
+          } else {
+            router.push("/404");
+          }
+        } catch (error) {
+          console.error("Error fetching job details:", error);
+          router.push("/404");
+        }
+      };
+
+      fetchJob();
+    }
+  }, [id, initialJob, router]);
+
+  // During initial server-side render or if no job data
+  if (!job) {
+    return null;
+  }
+
   const renderedMarkdown = marked.parse(job.job_markdown);
 
   // Prepare SEO data
