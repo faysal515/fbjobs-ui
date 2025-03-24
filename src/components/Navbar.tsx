@@ -11,12 +11,12 @@ export default function Navbar() {
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
-              <div className="p-4 mt-8">
+              <div className="p-4">
                 <Image
-                  src="/logo.svg"
+                  src="/logo.png"
                   alt="BD Jobs Logo"
-                  width={120}
-                  height={40}
+                  width={240}
+                  height={80}
                 />
               </div>
             </Link>
